@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LiBee Studio</title>
+    <link rel="stylesheet" href="https://unpkg.com/spectre.css/dist/spectre.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/spectre.css/dist/spectre-exp.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/spectre.css/dist/spectre-icons.min.css">
+    <link rel="stylesheet" href="/layout.css">
+  </head>
+  <body>
+    <div class="parent">
+        <div class="div1"> 
+            <header class="navbar">
+                <section class="navbar-section">
+                    <a href="/" id="logo" class="btn btn-link">LiBee Studio</a>
+                </section>
+
+                <section class="navbar-center">
+                    <a href="/" class="btn btn-link" id="active">HOME</a>
+                    <a href="/about.hbs" class="btn btn-link">ABOUT</a>
+                    <a href="/projects" class="btn btn-link">PROJECTS</a>
+                    <a href="/blog" class="btn btn-link">BLOG</a>
+                    <a href="/contact" class="btn btn-link">CONTACT</a>
+                </section>
+                
+                <section class="navbar-section">
+                    <a href="/faq" class="btn btn-link">FAQ</a>
+                </section>
+            </header>
+        </div>
+
+            <div class="div2">
+                {{{body}}}
+            </div>
+            
+
+                <footer>
+                    Copyright Linn Benjamin 2022
+                </footer>
+            </div>
+        </div>
+    </div>
+
+  </body>
+</html>
