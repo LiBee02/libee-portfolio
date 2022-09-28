@@ -105,7 +105,6 @@ p{
 
 .about-me{
     position:relative;
-    padding-top:10rem;
 }
 
 
@@ -114,4 +113,8 @@ footer {
     position:relative;
     text-align:center;
     top:4rem;
+}
+
+.projects{
+    text-align:center;
 }

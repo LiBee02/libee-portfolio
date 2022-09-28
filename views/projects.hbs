@@ -1,0 +1,20 @@
+<h1>Projects</h1>
+
+
+
+{{#if projects.length}}
+
+    <ul>
+        {{#each projects}}
+        <li><a href="/projects/{{id}}">{{title}}</a> ({{difficulty}} / 10)</li>
+
+        {{/each}}
+    </ul>
+
+{{else}}
+
+<p>No projects have been posted yet!</p>
+
+{{/if}}
+
+
