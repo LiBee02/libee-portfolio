@@ -133,29 +133,29 @@ app.post("/create-project",function(request, response) {
 
   //*HAVENT IMPLEMENTED THIS YET*/
   
-//app.get("/login", function(request, response){
-	//response.render("login.hbs")
-//})
+app.get("/login", function(request, response){
+	response.render("login.hbs")
+})
 
-//app.post("/login", function(request, response){
+app.post("/login", function(request, response){
 	
-	//const username = request.body.username
-	//const password = request.body.password
+	const username = request.body.username
+	const password = request.body.password
 	
-	//if(username == ADMIN_USERNAME && password == ADMIN_PASSWORD){
+	if(username == ADMIN_USERNAME && password == ADMIN_PASSWORD){
 		
-	//	request.session.isLoggedIn = true
+		request.session.isLoggedIn = true
 		
-		//response.redirect("/")
+	  response.redirect("/")
 		
-	//}else{
+	}else{
 		
-		//const model = {
-	//		failedToLogin: true
-//		}
+		const model = {
+			failedToLogin: true
+		}
 		
-	//	response.render('login.hbs', model)
+		response.render('login.hbs', model)
 		
-	//}
+	}
 	
-//})
+})

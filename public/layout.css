@@ -93,7 +93,7 @@ p{
 .button-1 {
     top:3rem;
     border: 3px solid black;
-  }
+}
 
   
 .button-1:hover {
@@ -101,7 +101,18 @@ p{
     cursor:pointer;
     border: 3px solid #FF00B8;
     background-color:#FF00B8;
-  }
+}
+
+.button-2 {
+    color:#7d7d7d;
+    border: 3px solid #7d7d7d;
+}
+
+.button-2:hover{
+    cursor:pointer;
+    background-color:#7d7d7d;
+    color:white;
+}
 
 .about-me{
     position:relative;
