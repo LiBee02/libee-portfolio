@@ -67,15 +67,17 @@ app.post("/create-project",function(request, response) {
   const date = request.body.date
   const content = request.body.content
 
-  data.projects.push({
-    id: data.projects.at(-1).id + 1,
-    name: name,
-    date: date,
-    content: content
+  const query = `INSERT INTO projects (name, date, content) VALUES (?, ?, ?)`;
+
+  const values = [name, date, content];
+
+  db.run(query, values, function (error){
+
+    response.redirect("/projects")
+
+
   })
 
-  response.redirect("/projects")
-	
 })
 
 
@@ -83,18 +85,25 @@ app.post("/create-project",function(request, response) {
   app.get("/projects/:id", function(request, response){
 
     const id = request.params.id
-
-    const project = data.projects.find(p => p.id == id)
-
-    const model = {
-      project: project,
-    }
-
-    response.render('movie.hbs', model)
+	
+    const query = `SELECT * FROM projects WHERE id = ?`
+    const values = [id]
+    
+    db.get(query, values, function(error, project){
+      
+      const model = {
+        project,
+      }
+      
+      response.render('project.hbs', model)
+      
+    })
 
   })
 
   app.listen(8080)
+
+
 
 
 
