@@ -2,7 +2,9 @@
 
 {{#if project}}
 
-    <p>The project {{project.title}} has a difficulty of {{project.difficulty}} / 10</p>
+    <p>The project {{project.name}} was created {{project.date}} / {{project.date}} - {{project.date}}. </p>
+    <p>{{project.content}}</p>
+
 {{else}}
 <p>That project does not exist.</p>
 {{/if}}
