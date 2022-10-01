@@ -9,7 +9,8 @@ db.run(`
 		id INTEGER PRIMARY KEY,
 		name TEXT,
 		date INTEGER,
-    content TEXT
+    content TEXT,
+    link TEXT
 	)
 `)
 
@@ -66,10 +67,11 @@ app.post("/create-project",function(request, response) {
   const name = request.body.name
   const date = request.body.date
   const content = request.body.content
+  const link = request.body.link
 
-  const query = `INSERT INTO projects (name, date, content) VALUES (?, ?, ?)`;
+  const query = `INSERT INTO projects (name, date, content, link) VALUES (?, ?, ?, ?)`;
 
-  const values = [name, date, content];
+  const values = [name, date, content, link];
 
   db.run(query, values, function (error){
 
@@ -131,8 +133,8 @@ app.post("/create-project",function(request, response) {
 
 
 
-  //*HAVENT IMPLEMENTED THIS YET*/
-  
+//*HAVENT IMPLEMENTED THIS YET*/
+  /*
 app.get("/login", function(request, response){
 	response.render("login.hbs")
 })
@@ -159,3 +161,4 @@ app.post("/login", function(request, response){
 	}
 	
 })
+*/
