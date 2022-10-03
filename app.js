@@ -1,3 +1,4 @@
+const { response } = require('express')
 const express = require('express')
 const expressHandlebars = require('express-handlebars')
 const sqlite3 = require('sqlite3')
@@ -103,6 +104,30 @@ app.post("/create-project",function(request, response) {
 
   })
 
+
+  app.get("/projects-delete/:id", function(request, response){
+    const id = request.params.id
+
+    const query = `DELETE FROM projects where id = ?`
+    const values = [id]
+
+    db.run(query, values)
+
+    response.redirect('/projects')
+  })
+
+/*
+  app.get("/projects-edit/:id", function(request, response){
+    const id = request.params.id
+
+    const query = `EDIT FROM projects where id = ?`
+    const values = [id]
+
+    db.run(query, values)
+
+    response.redirect('/projects')
+  })
+*/
   app.listen(8080)
 
 

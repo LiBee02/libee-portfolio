@@ -1,6 +1,7 @@
 <h1>Project</h1>
 
 {{#if project}}
+    <a href="/projects-delete/{{project.id}}" class="btn">Delete project</a>
 
     <p>The project {{project.name}} was created {{project.date}}. </p>
     <p>{{project.content}}</p>
