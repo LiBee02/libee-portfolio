@@ -1,0 +1,17 @@
+<h1>Edit Project</h1>
+
+<form method="POST">
+    <div>
+        Name: <input type="text" name="name" value="{{project.name}}">
+    </div>
+    <div>
+        Date: <input type="date" name="date" value="{{project.date}}">
+    </div>
+    <div>
+        Content: <input type="text" name="content" value="{{project.content}}">
+    </div>
+    <div>
+        Link: <input type="text" name="link" value="{{project.link}}">
+    </div>
+    <input type="submit" value="Update project" id="submit-button">
+</form>

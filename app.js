@@ -75,16 +75,17 @@ app.post("/create-project",function(request, response) {
   const values = [name, date, content, link];
 
   db.run(query, values, function (error){
-
-    response.redirect("/projects")
-
-
+    if(error){
+      console.log(error)
+    }else{
+      response.redirect("/projects/"+this.lastID)
+    }
   })
 
 })
 
 
-  //GET /projects/id
+
   app.get("/projects/:id", function(request, response){
 
     const id = request.params.id
@@ -93,12 +94,18 @@ app.post("/create-project",function(request, response) {
     const values = [id]
     
     db.get(query, values, function(error, project){
-      
-      const model = {
-        project,
+
+      if(error){
+        console.log(error)
+        //isplay error
+      }else{
+
+        const model = {
+          project,
+        }
+        
+        response.render('project.hbs', model)
       }
-      
-      response.render('project.hbs', model)
       
     })
 
@@ -116,18 +123,25 @@ app.post("/create-project",function(request, response) {
     response.redirect('/projects')
   })
 
-/*
-  app.get("/projects-edit/:id", function(request, response){
+
+
+  app.get("/edit-project/:id", function(request, response){
+
     const id = request.params.id
 
-    const query = `EDIT FROM projects where id = ?`
-    const values = [id]
+    const project = projects.find(
+      p => p.id == id
+    )
 
-    db.run(query, values)
+    const model = {
+      project
+    }
 
-    response.redirect('/projects')
+    response.render("edit-project.hbs", model)
+
   })
-*/
+  
+
   app.listen(8080)
 
 

@@ -1,4 +1,8 @@
 <h1>Projects</h1>
+{{#if dbError}}
+    <p>Cannot display the page now, try again later.</p>
+
+{{else}}
 
 <div>
     <h2>Create new project?</h2>
@@ -16,6 +20,8 @@
 {{else}}
 
 <p>No projects have been posted yet!</p>
+
+{{/if}}
 
 {{/if}}
 
