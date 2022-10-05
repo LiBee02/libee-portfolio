@@ -1,13 +1,13 @@
 <h1>Edit Project</h1>
 
-<form method="POST">
+<form action="/edit-project/{{project.id}}" method="POST">
     <div>
         Name: <input type="text" name="name" value="{{project.name}}">
     </div>
     <div>
         Date: <input type="date" name="date" value="{{project.date}}">
     </div>
-    <div>
+    <div >
         Content: <input type="text" name="content" value="{{project.content}}">
     </div>
     <div>

@@ -140,18 +140,49 @@ app.post("/create-project",function(request, response) {
 
     const id = request.params.id
 
-    const project = projects.find(
-      p => p.id == id
-    )
+    const query = `SELECT * FROM projects WHERE id = ?`
+    const values = [id]
+    
+    db.get(query, values, function(error, project){
 
-    const model = {
-      project
-    }
-
-    response.render("edit-project.hbs", model)
+      if(error){
+        console.log(error)
+        //Display error
+      }else{
+        const model = {
+          project
+        }
+    
+        response.render("edit-project.hbs", model)
+        
+      }
+      
+    })
 
   })
   
+  app.post("/edit-project/:id",function(request, response) {
+
+    const id = request.params.id
+
+    const name = request.body.name
+    const date = request.body.date
+    const content = request.body.content
+    const link = request.body.link
+  
+    const query = `UPDATE projects SET name = ?, date = ?, content = ?, link = ? WHERE id = ?`;
+  
+    const values = [name, date, content, link, id];
+  
+    db.run(query, values, function (error){
+      if(error){
+        console.log(error)
+      }else{
+        response.redirect("/projects/" + id)
+      }
+    })
+  
+  })
 
   app.listen(8080)
 
@@ -226,6 +257,9 @@ app.post("/create-project",function(request, response) {
       })
   
     })
+
+
+    
 
 
   app.get('/about', function(request, response){
