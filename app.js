@@ -15,6 +15,17 @@ db.run(`
 	)
 `)
 
+db.run(`
+	CREATE TABLE IF NOT EXISTS messages (
+		id INTEGER PRIMARY KEY,
+		firstname TEXT,
+		lastname TEXT,
+    email TEXT,
+    phone INTEGER,
+    message TEXT
+	)
+`)
+
 const app = express()
 
 app.engine("hbs", expressHandlebars.engine({
@@ -97,7 +108,7 @@ app.post("/create-project",function(request, response) {
 
       if(error){
         console.log(error)
-        //isplay error
+        //Display error
       }else{
 
         const model = {
@@ -124,7 +135,7 @@ app.post("/create-project",function(request, response) {
   })
 
 
-
+//ASK FOR HELP ON THIS PART
   app.get("/edit-project/:id", function(request, response){
 
     const id = request.params.id
@@ -147,6 +158,75 @@ app.post("/create-project",function(request, response) {
 
 
 
+//CONTACT ME//
+//CONTACT ME//
+  app.get('/create-message', function(request, response){
+    response.render('create-message.hbs')
+  })
+
+  app.post("/create-message",function(request, response) {
+  
+    const firstname = request.body.firstname
+    const lastname = request.body.lastname
+    const email = request.body.email
+    const phone = request.body.phone
+    const message = request.body.phone
+  
+    const query = `INSERT INTO messages (firstname, lastname, email, phone, message) VALUES (?, ?, ?, ?, ?)`
+  
+    const values = [firstname, lastname, email, phone, message]
+
+    db.run(query, values, function (error){
+      if(error){
+        console.log(error)
+      }else{
+        response.redirect("/messages/"+this.lastID)
+      }
+    })
+
+  })
+  
+  app.get('/messages', function(request, response){
+
+    const query = `SELECT * FROM messages`
+  
+    db.all(query, function(error, messages){
+  
+      const model = {
+        messages,
+      }
+    
+        response.render('messages.hbs', model)
+    
+    })
+    
+  })
+  
+    app.get("/messages/:id", function(request, response){
+  
+      const id = request.params.id
+    
+      const query = `SELECT * FROM messages WHERE id = ?`
+      const values = [id]
+      
+      db.get(query, values, function(error, message){
+  
+        if(error){
+          console.log(error)
+          //Display error
+        }else{
+  
+          const model = {
+            message,
+          }
+          
+          response.render('messages', model)
+        }
+        
+      })
+  
+    })
+
 
   app.get('/about', function(request, response){
     response.render('about.hbs')
@@ -154,10 +234,6 @@ app.post("/create-project",function(request, response) {
 
   app.get('/blog', function(request, response){
     response.render('blog.hbs')
-  })
-
-  app.get('/contact', function(request, response){
-    response.render('contact.hbs')
   })
 
   app.get('/faq', function(request, response){

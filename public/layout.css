@@ -114,11 +114,19 @@ p{
     color:white;
 }
 
-.submit-button{
-    top:3rem;
+#submit-button{
     border: 3px solid black;
     background-color:white;
     color:black;
+    font-weight:600;
+    padding:6px 10px;
+    transition: 0.4s;
+}
+
+#submit-button:hover{
+    border: 3px solid #FF00B8;
+    color:#FF00B8;
+    cursor:pointer;
 }
 
 .about-me{
@@ -141,4 +149,10 @@ footer {
 
 .projects{
     text-align:center;
+}
+
+/*CONTACT PAGE*//*CONTACT PAGE*/
+.contact-me-btn{
+    position:relative;
+    top:12px;
 }
