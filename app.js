@@ -201,7 +201,7 @@ app.post("/create-project",function(request, response) {
     const lastname = request.body.lastname
     const email = request.body.email
     const phone = request.body.phone
-    const message = request.body.phone
+    const message = request.body.message
   
     const query = `INSERT INTO messages (firstname, lastname, email, phone, message) VALUES (?, ?, ?, ?, ?)`
   
@@ -211,7 +211,7 @@ app.post("/create-project",function(request, response) {
       if(error){
         console.log(error)
       }else{
-        response.redirect("/messages/"+this.lastID)
+        response.render("message-sent.hbs")
       }
     })
 
@@ -228,12 +228,11 @@ app.post("/create-project",function(request, response) {
       }
     
         response.render('messages.hbs', model)
-    
     })
     
   })
   
-    app.get("/messages/:id", function(request, response){
+    app.get("/message/:id", function(request, response){
   
       const id = request.params.id
     
@@ -251,7 +250,7 @@ app.post("/create-project",function(request, response) {
             message,
           }
           
-          response.render('messages', model)
+          response.render('message.hbs', model)
         }
         
       })
