@@ -1,0 +1,10 @@
+<h1>Guest</h1>
+
+{{#if guest}}
+    <p>{{guest.firstname}} {{guest.lastname}}</p>
+    <p>Email: {{guest.email}}</p>
+    <p>Message: {{guest.message}}</p>
+
+{{else}}
+<p>That client does not exist.</p>
+{{/if}}
