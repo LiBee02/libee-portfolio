@@ -26,6 +26,17 @@ db.run(`
 	)
 `)
 
+// FOR THE GUESTBOOK
+db.run(` 
+	CREATE TABLE IF NOT EXISTS guests (
+		id INTEGER PRIMARY KEY,
+		firstname TEXT,
+		lastname TEXT,
+    email TEXT,
+    message TEXT
+	)
+`)
+
 const app = express()
 
 app.engine("hbs", expressHandlebars.engine({
@@ -135,7 +146,6 @@ app.post("/create-project",function(request, response) {
   })
 
 
-//ASK FOR HELP ON THIS PART
   app.get("/edit-project/:id", function(request, response){
 
     const id = request.params.id
@@ -258,19 +268,92 @@ app.post("/create-project",function(request, response) {
     })
 
 
+
+
+
+
+
+    //GUESTBOOK//GUESTBOOK
     
+    app.get('/guests', function(request, response){
+      response.render('guests.hbs')
+    })
+
+    app.get('/create-guest', function(request, response){
+      response.render('create-guest.hbs')
+    })
+  
+    app.post("/create-guest",function(request, response) {
+    
+      const firstname = request.body.firstname
+      const lastname = request.body.lastname
+      const email = request.body.email
+      const message = request.body.message
+    
+      const query = `INSERT INTO guests (firstname, lastname, email, message) VALUES (?, ?, ?, ?)`
+    
+      const values = [firstname, lastname, email, message]
+  
+      db.run(query, values, function (error){
+        if(error){
+          console.log(error)
+        }else{
+          response.render("guest-sent.hbs")
+        }
+      })
+  
+    })
+    
+    app.get('/guests', function(request, response){
+  
+      const query = `SELECT * FROM guests`
+    
+      db.all(query, function(error, guests){
+    
+        const model = {
+          guests,
+        }
+      
+          response.render('guests.hbs', model)
+      })
+      
+    })
+    
+      app.get("/guest/:id", function(request, response){
+    
+        const id = request.params.id
+      
+        const query = `SELECT * FROM guests WHERE id = ?`
+        const values = [id]
+        
+        db.get(query, values, function(error, guest){
+    
+          if(error){
+            console.log(error)
+            //Display error
+          }else{
+    
+            const model = {
+              guest,
+            }
+            
+            response.render('guest.hbs', model)
+          }
+          
+        })
+    
+      })
+
+
+
+
+
+
+
 
 
   app.get('/about', function(request, response){
     response.render('about.hbs')
-  })
-
-  app.get('/blog', function(request, response){
-    response.render('blog.hbs')
-  })
-
-  app.get('/faq', function(request, response){
-    response.render('faq.hbs')
   })
 
 

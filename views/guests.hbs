@@ -1,0 +1,21 @@
+<h1>Guestbook</h1>
+{{#if dbError}}
+    <p>Cannot display the page now, try again later.</p>
+
+{{else}}
+
+{{#if guests.length}}
+
+    <ul>
+        {{#each guests}}
+        <li><a href="/guest/{{id}}">Anonym: {{message}}</a></li>
+        {{/each}}
+    </ul>
+
+{{else}}
+
+<p>No one has written yet.</p>
+
+{{/if}}
+
+{{/if}}
