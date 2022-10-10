@@ -3,6 +3,10 @@ const express = require('express')
 const expressHandlebars = require('express-handlebars')
 const sqlite3 = require('sqlite3')
 
+const MIN_PROJECT_NAME_LENGTH = 2
+const MIN_PROJECT_CONTENT_LENGTH = 10
+
+
 const db = new sqlite3.Database('libee-database.db')
 
 db.run(`
@@ -85,24 +89,56 @@ app.get('/create-project', function(request, response){
   response.render('create-project.hbs')
 })
 
+function getValidationErrorsForProject(name, date, content){
+  const validationErrors = []
+
+  if(MIN_PROJECT_NAME_LENGTH >= name.length){
+    validationErrors.push("Name must contain at least " + MIN_PROJECT_NAME_LENGTH + " characters.")
+  }
+  if(isNaN(date)){
+    validationErrors.push("Must enter a valid date.")
+  }else if(date < 0){
+    validationErrors.push("Date can't be negative.")
+  }
+  if(MIN_PROJECT_CONTENT_LENGTH >= content.length){
+    validationErrors.push("Content must contain at least " + MIN_PROJECT_CONTENT_LENGTH + " characters.")
+  }
+
+  return validationErrors
+
+}
+
 app.post("/create-project",function(request, response) {
 
   const name = request.body.name
-  const date = request.body.date
+  const date = parseInt(request.body.date)
   const content = request.body.content
   const link = request.body.link
 
-  const query = `INSERT INTO projects (name, date, content, link) VALUES (?, ?, ?, ?)`;
+  const validationErrors = getValidationErrorsForProject(name, date, content)
 
-  const values = [name, date, content, link];
-
-  db.run(query, values, function (error){
-    if(error){
-      console.log(error)
-    }else{
-      response.redirect("/projects/"+this.lastID)
+  if(validationErrors.length == 0){
+    const query = `INSERT INTO projects (name, date, content, link) VALUES (?, ?, ?, ?)`;
+    const values = [name, date, content, link];
+  
+    db.run(query, values, function (error){
+      if(error){
+        console.log(error)
+      }else{
+        response.redirect("/projects/"+this.lastID)
+      }
+    })
+  
+  }else{
+    const model = {
+      validationErrors,
+      name, 
+      date,
+      content,
+      link
     }
-  })
+    response.render('create-project.hbs', model)
+  }
 
 })
 
@@ -174,24 +210,46 @@ app.post("/create-project",function(request, response) {
   app.post("/edit-project/:id",function(request, response) {
 
     const id = request.params.id
+    const newName = request.body.name
+    const newDate = parseInt(request.body.date)
+    const newContent = request.body.content
+    const newLink = request.body.link
 
-    const name = request.body.name
-    const date = request.body.date
-    const content = request.body.content
-    const link = request.body.link
+    const validationErrors = getValidationErrorsForProject(newName, newDate, newContent, newLink)
+    
+    if(validationErrors.length == 0){
+      const query = `UPDATE projects SET name = ?, date = ?, content = ?, link = ? WHERE id = ?`;
   
-    const query = `UPDATE projects SET name = ?, date = ?, content = ?, link = ? WHERE id = ?`;
-  
-    const values = [name, date, content, link, id];
+    const values = [newName, newDate, newContent, newLink, id];
   
     db.run(query, values, function (error){
       if(error){
+        
         console.log(error)
+      
       }else{
         response.redirect("/projects/" + id)
       }
     })
+
+    }else{
+
+      const model = {
+        project: {
+          id,
+          name: newName,
+          date: newDate,
+          content: newContent,
+          link: newLink
+        },
+        validationErrors
+      }
   
+      response.render("edit-project.hbs", model)
+      
+    }
+  
+    
   })
 
   app.listen(8080)
@@ -273,12 +331,7 @@ app.post("/create-project",function(request, response) {
 
 
 
-    //GUESTBOOK//GUESTBOOK
-    
-    app.get('/guests', function(request, response){
-      response.render('guests.hbs')
-    })
-
+    //GUESTBOOK/
     app.get('/create-guest', function(request, response){
       response.render('create-guest.hbs')
     })

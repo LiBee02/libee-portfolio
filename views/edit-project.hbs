@@ -1,4 +1,12 @@
 <h1>Edit Project</h1>
+{{#if validationErrors.length}}
+    <p>Could not create the human because:</p>
+    <ul>
+        {{#each validationErrors}}
+        <li>{{this}}</li>
+        {{/each}}
+    </ul>
+{{/if}}
 
 <form action="/edit-project/{{project.id}}" method="POST">
     <div>

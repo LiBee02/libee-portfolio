@@ -8,13 +8,13 @@
 
     <ul>
         {{#each guests}}
-        <li><href="/guest/{{id}}">Anonym: {{message}}</li>
+        <li><a href="/guest/{{id}}">{{firstname}} {{lastname}}</a></li>
         {{/each}}
     </ul>
 
 {{else}}
 
-<p>No one has written yet.</p>
+<p>No guests have written here yet.</p>
 
 {{/if}}
 
