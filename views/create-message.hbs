@@ -1,5 +1,12 @@
 <h1>Contact me</h1>
-
+{{#if validationErrors.length}}
+    <p>Could not send the message because:</p>
+    <ul>
+        {{#each validationErrors}}
+        <li>{{this}}</li>
+        {{/each}}
+    </ul>
+{{/if}}
 
 <form action="/create-message" method="POST">
     <div>

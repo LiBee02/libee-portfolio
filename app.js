@@ -3,8 +3,14 @@ const express = require('express')
 const expressHandlebars = require('express-handlebars')
 const sqlite3 = require('sqlite3')
 
+//CREATE PROJECT
 const MIN_PROJECT_NAME_LENGTH = 2
 const MIN_PROJECT_CONTENT_LENGTH = 10
+
+//CREATE MESSAGE
+const MIN_MESSAGE_MESSAGE_LENGTH = 20
+const MIN_MESSAGE_FIRSTNAME_LENGTH = 2
+const MIN_MESSAGE_LASTNAME_LENGTH = 2
 
 
 const db = new sqlite3.Database('libee-database.db')
@@ -89,7 +95,7 @@ app.get('/create-project', function(request, response){
   response.render('create-project.hbs')
 })
 
-function getValidationErrorsForProject(name, date, content){
+function getValidationErrorsForProject(name, content, firstname, lastname, message){
   const validationErrors = []
 
   if(MIN_PROJECT_NAME_LENGTH >= name.length){
@@ -258,17 +264,35 @@ app.post("/create-project",function(request, response) {
     response.render('create-message.hbs')
   })
 
+  function getValidationErrorsForMessage(firstname, lastname, message){
+    const validationErrors = []
+    if(MIN_MESSAGE_FIRSTNAME_LENGTH >= firstname.length){
+      validationErrors.push("First name must contain at least " + MIN_MESSAGE_FIRSTNAME_LENGTH + " characters.")
+    }
+    if(MIN_MESSAGE_LASTNAME_LENGTH >= lastname.length){
+      validationErrors.push("Last name must contain at least " + MIN_MESSAGE_LASTNAME_LENGTH + " characters.")
+    }
+    if(MIN_MESSAGE_MESSAGE_LENGTH >= message.length){
+      validationErrors.push("Message must contain at least " + MIN_MESSAGE_MESSAGE_LENGTH + " characters.")
+    }
+    
+    return validationErrors
+  
+  }
+
+
   app.post("/create-message",function(request, response) {
   
     const firstname = request.body.firstname
     const lastname = request.body.lastname
     const email = request.body.email
-    const phone = request.body.phone
+    const phone = parseInt(request.body.phone)
     const message = request.body.message
   
-    const validationErrors = getValidationErrorsForProject(firstname, lastname, email, phone, message)
+    const validationErrors = getValidationErrorsForMessage(firstname, lastname, email, phone, message)
 
     if(validationErrors.length == 0){
+
       const query = `INSERT INTO messages (firstname, lastname, email, phone, message) VALUES (?, ?, ?, ?, ?)`
       const values = [firstname, lastname, email, phone, message]
     
@@ -279,7 +303,7 @@ app.post("/create-project",function(request, response) {
           response.render("message-sent.hbs")
         }
       })
-    
+
     }else{
       const model = {
         validationErrors,
@@ -289,7 +313,7 @@ app.post("/create-project",function(request, response) {
         phone,
         message
       }
-      response.render('create-project.hbs', model)
+      response.render('create-message.hbs', model)
     }
 
 
