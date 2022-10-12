@@ -95,11 +95,6 @@ function getValidationErrorsForProject(name, date, content){
   if(MIN_PROJECT_NAME_LENGTH >= name.length){
     validationErrors.push("Name must contain at least " + MIN_PROJECT_NAME_LENGTH + " characters.")
   }
-  if(isNaN(date)){
-    validationErrors.push("Must enter a valid date.")
-  }else if(date < 0){
-    validationErrors.push("Date can't be negative.")
-  }
   if(MIN_PROJECT_CONTENT_LENGTH >= content.length){
     validationErrors.push("Content must contain at least " + MIN_PROJECT_CONTENT_LENGTH + " characters.")
   }
@@ -111,7 +106,7 @@ function getValidationErrorsForProject(name, date, content){
 app.post("/create-project",function(request, response) {
 
   const name = request.body.name
-  const date = parseInt(request.body.date)
+  const date = request.body.date
   const content = request.body.content
   const link = request.body.link
 
@@ -211,7 +206,7 @@ app.post("/create-project",function(request, response) {
 
     const id = request.params.id
     const newName = request.body.name
-    const newDate = parseInt(request.body.date)
+    const newDate = request.body.date
     const newContent = request.body.content
     const newLink = request.body.link
 
@@ -271,17 +266,32 @@ app.post("/create-project",function(request, response) {
     const phone = request.body.phone
     const message = request.body.message
   
-    const query = `INSERT INTO messages (firstname, lastname, email, phone, message) VALUES (?, ?, ?, ?, ?)`
-  
-    const values = [firstname, lastname, email, phone, message]
+    const validationErrors = getValidationErrorsForProject(firstname, lastname, email, phone, message)
 
-    db.run(query, values, function (error){
-      if(error){
-        console.log(error)
-      }else{
-        response.render("message-sent.hbs")
+    if(validationErrors.length == 0){
+      const query = `INSERT INTO messages (firstname, lastname, email, phone, message) VALUES (?, ?, ?, ?, ?)`
+      const values = [firstname, lastname, email, phone, message]
+    
+      db.run(query, values, function (error){
+        if(error){
+          console.log(error)
+        }else{
+          response.render("message-sent.hbs")
+        }
+      })
+    
+    }else{
+      const model = {
+        validationErrors,
+        firstname,
+        lastname,
+        email,
+        phone,
+        message
       }
-    })
+      response.render('create-project.hbs', model)
+    }
+
 
   })
   
@@ -325,7 +335,16 @@ app.post("/create-project",function(request, response) {
   
     })
 
-
+    app.get("/message-delete/:id", function(request, response){
+      const id = request.params.id
+  
+      const query = `DELETE FROM messages where id = ?`
+      const values = [id]
+  
+      db.run(query, values)
+  
+      response.redirect('/messages')
+    })
 
 
 

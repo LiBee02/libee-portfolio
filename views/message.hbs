@@ -1,6 +1,8 @@
 <h1>Client</h1>
 
 {{#if message}}
+    <a href="/message-delete/{{message.id}}" class="btn">Delete Message</a>
+
     <p>{{message.firstname}} {{message.lastname}}</p>
     <p>Email: {{message.email}}</p>
     <p>Phone: {{message.phone}}</p>
