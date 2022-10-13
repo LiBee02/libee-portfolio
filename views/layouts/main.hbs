@@ -24,10 +24,18 @@
                     <a href="/about" class="btn btn-link">ABOUT</a>
                     <a href="/projects" class="btn btn-link">PROJECTS</a>
                     <a href="/create-guest" class="btn btn-link">GUESTBOOK</a>
-                </section>
-                
-                <section class="navbar-section">
                     <a href="/create-message" class="btn btn-link">CONTACT</a>
+                </section>
+                <section class="navbar-section">
+                    {{#unless isLoggedIn}}
+                    <a href="/login" class="btn btn-link">LOGIN</a>
+                    {{/unless}}
+
+                    {{#if isLoggedIn}}
+                    <form action="/logout" method="POST">
+                        <input type="submit" value="LOGOUT" id="logout-button">
+                    </form>
+                    {{/if}}
                 </section>
             </header>
         </div>

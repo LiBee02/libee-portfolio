@@ -9,8 +9,11 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "express": "^4.18.1",
+    "express": "^4.18.2",
     "express-handlebars": "^6.0.6",
+    "express-session": "^1.17.3",
+    "express-sessions": "^1.0.6",
+    "session": "^0.1.0",
     "sqlite3": "^5.1.1"
   },
   "repository": {

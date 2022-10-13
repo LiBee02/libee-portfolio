@@ -2,6 +2,7 @@ const { response } = require('express')
 const express = require('express')
 const expressHandlebars = require('express-handlebars')
 const sqlite3 = require('sqlite3')
+const expressSession = require("express-session")
 
 //CREATE PROJECT
 const MIN_PROJECT_NAME_LENGTH = 2
@@ -17,7 +18,7 @@ const db = new sqlite3.Database('libee-database.db')
 
 db.run(`
 	CREATE TABLE IF NOT EXISTS projects (
-		id INTEGER PRIMARY KEY,
+		id INTEGER PRIMARY KEY AUTOINCREMENT,
 		name TEXT,
 		date INTEGER,
     content TEXT,
@@ -27,7 +28,7 @@ db.run(`
 
 db.run(`
 	CREATE TABLE IF NOT EXISTS messages (
-		id INTEGER PRIMARY KEY,
+		id INTEGER PRIMARY KEY AUTOINCREMENT,
 		firstname TEXT,
 		lastname TEXT,
     email TEXT,
@@ -39,7 +40,7 @@ db.run(`
 // FOR THE GUESTBOOK
 db.run(` 
 	CREATE TABLE IF NOT EXISTS guests (
-		id INTEGER PRIMARY KEY,
+		id INTEGER PRIMARY KEY AUTOINCREMENT,
 		firstname TEXT,
 		lastname TEXT,
     email TEXT,
@@ -48,6 +49,15 @@ db.run(`
 `)
 
 const app = express()
+
+app.use(expressSession({
+  secret: "dawdadsdfafasddwadshjt",
+  saveUninitialized: false,
+  resave: false
+}))
+
+const ADMIN_USERNAME = "admin"
+const ADMIN_PASSWORD = "123"
 
 app.engine("hbs", expressHandlebars.engine({
   defaultLayout: 'main.hbs'
@@ -63,12 +73,18 @@ app.use(
   })
 )
 
+app.use(function(request, response, next){
+
+  const isLoggedIn = request.session.isLoggedIn
+
+  response.locals.isLoggedIn = isLoggedIn
+
+  next()
+
+})
+
 
 app.get('/', function(request, response){
-  
-  const model = {
-		session: request.session
-	}
 
   response.render('home.hbs')
 })
@@ -253,7 +269,7 @@ app.post("/create-project",function(request, response) {
     
   })
 
-  app.listen(8080)
+ 
 
 
 
@@ -442,12 +458,7 @@ app.post("/create-project",function(request, response) {
 
 
 
-
-
-
-
-
-
+//ABOUT PAGE
   app.get('/about', function(request, response){
     response.render('about.hbs')
   })
@@ -457,28 +468,23 @@ app.post("/create-project",function(request, response) {
 
 
 
-
-
-
-//*HAVENT IMPLEMENTED THIS YET*/
-  /*
+// LOGIN
 app.get("/login", function(request, response){
 	response.render("login.hbs")
 })
 
 app.post("/login", function(request, response){
 	
-	const username = request.body.username
-	const password = request.body.password
+	const enteredUsername = request.body.username
+	const enteredPassword = request.body.password
 	
-	if(username == ADMIN_USERNAME && password == ADMIN_PASSWORD){
-		
+	if(enteredUsername == ADMIN_USERNAME && enteredPassword == ADMIN_PASSWORD){
+    // Login
 		request.session.isLoggedIn = true
-		
 	  response.redirect("/")
 		
 	}else{
-		
+    // Display error message to user
 		const model = {
 			failedToLogin: true
 		}
@@ -488,4 +494,13 @@ app.post("/login", function(request, response){
 	}
 	
 })
-*/
+
+app.post("/logout", function(request, response){
+  request.session.isLoggedIn = false
+  response.redirect("/")
+})
+
+
+
+
+app.listen(8080)
