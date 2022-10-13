@@ -152,9 +152,30 @@ footer {
 }
 
 /*CONTACT PAGE*//*CONTACT PAGE*/
-.contact-me-btn{
+#submit-button{
     position:relative;
     top:12px;
+}
+
+#all-forms{
+    width:20rem;
+    position:relative;
+    top:2rem;
+    font-weight:600;
+    color:black;
+}
+
+#all-forms div{
+    position:relative;
+    margin-top:10px;
+
+}
+
+#all-forms div input{
+    position:relative;
+    float:right;
+    width:100%;
+
 }
 
 /*LOGOUT PAGE*//*LOGOUT PAGE*/

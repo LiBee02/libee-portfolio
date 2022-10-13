@@ -5,10 +5,13 @@
 {{else}}
 
 <div>
-    <h2>You have new messages!</h2>
+    <h2>You have no new messages!</h2>
 </div>
 
 {{#if messages.length}}
+<div>
+    <h2>You have new messages!</h2>
+</div>
 
     <ul>
         {{#each messages}}
@@ -17,8 +20,6 @@
     </ul>
 
 {{else}}
-
-<p>No one has contacted!</p>
 
 {{/if}}
 

@@ -108,10 +108,10 @@ app.get('/projects', function(request, response){
 
 
 app.get('/create-project', function(request, response){
-  response.render('create-project.hbs')
+    response.render('create-project.hbs')
 })
 
-function getValidationErrorsForProject(name, content, firstname, lastname, message){
+function getValidationErrorsForProject(name, content){
   const validationErrors = []
 
   if(MIN_PROJECT_NAME_LENGTH >= name.length){
@@ -133,6 +133,11 @@ app.post("/create-project",function(request, response) {
   const link = request.body.link
 
   const validationErrors = getValidationErrorsForProject(name, date, content)
+
+  if(!request.session.isLoggedIn){
+    validationErrors.push("You have to log in.")
+
+  }
 
   if(validationErrors.length == 0){
     const query = `INSERT INTO projects (name, date, content, link) VALUES (?, ?, ?, ?)`;
