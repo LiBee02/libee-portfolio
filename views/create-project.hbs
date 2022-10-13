@@ -1,8 +1,8 @@
 <h1>New Project</h1>
-{{#if validationErrors.length}}
+{{#if errors.length}}
     <p>Could not create the project because:</p>
     <ul>
-        {{#each validationErrors}}
+        {{#each errors}}
         <li>{{this}}</li>
         {{/each}}
     </ul>

@@ -6,7 +6,7 @@ const expressSession = require("express-session")
 
 //CREATE PROJECT
 const MIN_PROJECT_NAME_LENGTH = 2
-const MIN_PROJECT_CONTENT_LENGTH = 10
+const MIN_PROJECT_CONTENT_LENGTH = 5 //IDK WTF IS GOING ON WITH THIS SHIT, 10 characters is fucked and below that is fucked too.
 
 //CREATE MESSAGE
 const MIN_MESSAGE_MESSAGE_LENGTH = 20
@@ -132,14 +132,13 @@ app.post("/create-project",function(request, response) {
   const content = request.body.content
   const link = request.body.link
 
-  const validationErrors = getValidationErrorsForProject(name, date, content)
+  const errors = validationErrors = getValidationErrorsForProject(name, date, content)
 
   if(!request.session.isLoggedIn){
-    validationErrors.push("You have to log in.")
-
+    errors.push("You have to log in.")
   }
 
-  if(validationErrors.length == 0){
+  if(errors.length == 0){
     const query = `INSERT INTO projects (name, date, content, link) VALUES (?, ?, ?, ?)`;
     const values = [name, date, content, link];
   
@@ -153,7 +152,7 @@ app.post("/create-project",function(request, response) {
   
   }else{
     const model = {
-      validationErrors,
+      errors,
       name, 
       date,
       content,
@@ -237,9 +236,9 @@ app.post("/create-project",function(request, response) {
     const newContent = request.body.content
     const newLink = request.body.link
 
-    const validationErrors = getValidationErrorsForProject(newName, newDate, newContent, newLink)
+    const errors = validationErrors = getValidationErrorsForProject(newName, newDate, newContent, newLink)
     
-    if(validationErrors.length == 0){
+    if(errors.length == 0){
       const query = `UPDATE projects SET name = ?, date = ?, content = ?, link = ? WHERE id = ?`;
   
     const values = [newName, newDate, newContent, newLink, id];
@@ -264,7 +263,7 @@ app.post("/create-project",function(request, response) {
           content: newContent,
           link: newLink
         },
-        validationErrors
+        errors
       }
   
       response.render("edit-project.hbs", model)
@@ -310,9 +309,9 @@ app.post("/create-project",function(request, response) {
     const phone = parseInt(request.body.phone)
     const message = request.body.message
   
-    const validationErrors = getValidationErrorsForMessage(firstname, lastname, email, phone, message)
+    const errors = validationErrors = getValidationErrorsForMessage(firstname, lastname, email, phone, message)
 
-    if(validationErrors.length == 0){
+    if(errors.length == 0){
 
       const query = `INSERT INTO messages (firstname, lastname, email, phone, message) VALUES (?, ?, ?, ?, ?)`
       const values = [firstname, lastname, email, phone, message]
@@ -327,7 +326,7 @@ app.post("/create-project",function(request, response) {
 
     }else{
       const model = {
-        validationErrors,
+        errors,
         firstname,
         lastname,
         email,

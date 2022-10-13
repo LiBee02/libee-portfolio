@@ -1,9 +1,9 @@
 <h1>Contact</h1>
 
-{{#if validationErrors.length}}
+{{#if errors.length}}
     <p>Could not send the message because:</p>
     <ul>
-        {{#each validationErrors}}
+        {{#each errors}}
         <li>{{this}}</li>
         {{/each}}
     </ul>
