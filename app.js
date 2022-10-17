@@ -17,6 +17,10 @@ const MIN_MESSAGE_LASTNAME_LENGTH = 2
 const MIN_COMMENTER_LENGTH = 2
 const MIN_COMMENT_LENGTH = 5
 
+//ADMIN CREDENTIALS
+const ADMIN_USERNAME = "admin"
+const ADMIN_PASSWORD = "abc123"
+
 
 const db = new sqlite3.Database('libee-database.db')
 
@@ -60,9 +64,6 @@ app.use(expressSession({
   saveUninitialized: false,
   resave: false
 }))
-
-const ADMIN_USERNAME = "admin"
-const ADMIN_PASSWORD = "123"
 
 app.engine("hbs", expressHandlebars.engine({
   defaultLayout: 'main.hbs'
@@ -244,6 +245,10 @@ app.post("/create-project",function(request, response) {
     const newLink = request.body.link
 
     const errors = validationErrors = getValidationErrorsForProject(newName, newDate, newContent, newLink)
+
+    if(!request.session.isLoggedIn){
+      errors.push("You have to log in.")
+    }
     
     if(errors.length == 0){
       const query = `UPDATE projects SET name = ?, date = ?, content = ?, link = ? WHERE id = ?`;
@@ -468,6 +473,23 @@ app.post("/create-project",function(request, response) {
     
       })
 
+    app.get("/guest-delete/:id", function(request, response){
+      const id = request.params.id
+  
+      const query = `DELETE FROM guests where id = ?`
+      const values = [id]
+  
+      db.run(query, values)
+  
+      response.redirect('/guests')
+    })
+
+
+
+
+
+
+      
 
 
 //ABOUT PAGE
@@ -496,8 +518,6 @@ app.post("/login", function(request, response){
 	  response.redirect("/")
 		
 	}else{
-    response.render("error-page.hbs")
-
 		const model = {
 			failedToLogin: true
 		}
@@ -512,117 +532,5 @@ app.post("/logout", function(request, response){
   request.session.isLoggedIn = false
   response.redirect("/")
 })
-
-
-
-
-
-
-
-
-
-
-//CREATE A COMMENT
-app.get('/create-comment', function(request, response){
-  response.render('create-comment.hbs')
-})
-
-function getValidationErrorsForMessage(comment, commenter){
-  const validationErrors = []
-  if(MIN_COMMENT_LENGTH >= comment.length){
-    validationErrors.push("The comment must contain at least " + MIN_COMMENT_LENGTH + " characters.")
-  }
-  if(MIN_COMMENTER_LENGTH >= commenter.length){
-    validationErrors.push("First name must contain at least " + MIN_COMMENTER_LENGTH + " characters.")
-  }
-  
-  return validationErrors
-
-}
-
-app.post("/create-comment",function(request, response) {
-
-  const comment = request.body.comment
-  const commenter = request.body.commenter
-
-  const errors = validationErrors = getValidationErrorsForMessage(comment, commenter)
-
-  if(errors.length == 0){
-
-    const query = `INSERT INTO comments (comment, commenter) VALUES (?, ?)`
-    const values = [comment, commenter]
-  
-    db.run(query, values, function (error){
-      if(error){
-        response.render("error-page.hbs")
-        
-      }else{
-        response.render("comment/:id.hbs")
-      }
-    })
-
-  }else{
-    const model = {
-      errors,
-      comment, 
-      commentor
-    }
-    response.render('create-comment.hbs', model)
-  }
-
-
-})
-
-app.get('/comments', function(request, response){
-
-  const query = `SELECT * FROM comments`
-
-  db.all(query, function(error, comments){
-
-    const model = {
-      comments,
-    }
-  
-      response.render('comments.hbs', model)
-  })
-  
-})
-
-  app.get("/comment/:id", function(request, response){
-
-    const id = request.params.id
-  
-    const query = `SELECT * FROM comments WHERE id = ?`
-    const values = [id]
-    
-    db.get(query, values, function(error, comments){
-
-      if(error){
-        response.render("error-page.hbs")
-
-      }else{
-
-        const model = {
-          comments,
-        }
-        
-        response.render('comments.hbs', model)
-      }
-      
-    })
-
-  })
-
-  app.get("/comment-delete/:id", function(request, response){
-    const id = request.params.id
-
-    const query = `DELETE FROM comments where id = ?`
-    const values = [id]
-
-    db.run(query, values)
-
-    response.redirect('/comments')
-  })
-
 
 app.listen(8080)

@@ -1,6 +1,9 @@
+{{#if isLoggedIn}}
 <h1>Guest</h1>
 
 {{#if guest}}
+    <a href="/guest-delete/{{guest.id}}" class="btn">Delete Guest</a>
+
     <p>{{guest.firstname}} {{guest.lastname}}</p>
     <p>Email: {{guest.email}}</p>
     <p>Message: {{guest.message}}</p>
@@ -8,3 +11,11 @@
 {{else}}
 <p>That client does not exist.</p>
 {{/if}}
+{{/if}}
+
+{{#unless isLoggedIn}}
+<div style="position:relative; text-align:center;">
+    <h1>You have to log in!</h1>
+    <button onclick="window.location.href='/login'" class="button button-1" type="button">LOGIN</button>
+</div>
+{{/unless}}

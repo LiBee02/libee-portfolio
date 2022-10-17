@@ -1,32 +1,34 @@
-{{#if isLoggedIn}}
-<h1>Guestbook</h1>
+<div class="guests">
+    <h1>Guestbook</h1>
 
-{{#if dbError}}
-    <p>Cannot display the page now, try again later.</p>
+    {{#if dbError}}
+        <p>Cannot display the page now, try again later.</p>
 
-{{else}}
+    {{else}}
 
-{{#if guests.length}}
+    {{#if guests.length}}
+    {{#if isLoggedIn}}
+        <ul id="guestbook-ul">
+            {{#each guests}}
+            <li><a href="/guest/{{id}}">{{firstname}}</a><br>{{message}}</li>
+            {{/each}}
+        </ul>
+    {{/if}}
 
-    <ul>
-        {{#each guests}}
-        <li><a href="/guest/{{id}}">{{firstname}} {{lastname}}</a></li>
-        {{/each}}
-    </ul>
+    {{#unless isLoggedIn}}
+        <ul id="guestbook-ul">
+            {{#each guests}}
+            <li><a style="cursor:default;">{{firstname}}</a><br>{{message}}</li>
+            {{/each}}
+        </ul>
+    {{/unless}}
 
-{{else}}
+    {{else}}
 
-<p>No guests have written here yet.</p>
+    <p>No guests have written here yet.</p>
 
-{{/if}}
+    {{/if}}
 
-{{/if}}
-
-{{/if}}
-
-{{#unless isLoggedIn}}
-<div style="position:relative; text-align:center;">
-    <h1>You have to log in!</h1>
-    <button onclick="window.location.href='/login'" class="button button-1" type="button">LOGIN</button>
+    {{/if}}
 </div>
-{{/unless}}
+
