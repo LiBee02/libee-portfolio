@@ -1,13 +1,14 @@
 <h1>Project</h1>
 
 {{#if project}}
+{{#if isLoggedIn}}
     <a href="/projects-delete/{{project.id}}" class="btn">Delete project</a>
     <a href="/edit-project/{{project.id}}" class="btn">Edit project</a>
-
+{{/if}}
     <p>The project {{project.name}} was created {{project.date}}. </p>
     <p>{{project.content}}</p>
     <a href="{{project.link}}">Link to the project</a>
-
+    
 {{else}}
 <p>That project does not exist.</p>
 {{/if}}

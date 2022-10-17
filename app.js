@@ -13,6 +13,10 @@ const MIN_MESSAGE_MESSAGE_LENGTH = 20
 const MIN_MESSAGE_FIRSTNAME_LENGTH = 2
 const MIN_MESSAGE_LASTNAME_LENGTH = 2
 
+//CREATE COMMENT
+const MIN_COMMENTER_LENGTH = 2
+const MIN_COMMENT_LENGTH = 5
+
 
 const db = new sqlite3.Database('libee-database.db')
 
@@ -47,6 +51,7 @@ db.run(`
     message TEXT
 	)
 `)
+
 
 const app = express()
 
@@ -90,6 +95,7 @@ app.get('/', function(request, response){
 })
 
 
+//PROJECTS
 app.get('/projects', function(request, response){
 
   const query = `SELECT * FROM projects`
@@ -107,10 +113,6 @@ app.get('/projects', function(request, response){
 })
 
 
-app.get('/create-project', function(request, response){
-    response.render('create-project.hbs')
-})
-
 function getValidationErrorsForProject(name, content){
   const validationErrors = []
 
@@ -124,6 +126,10 @@ function getValidationErrorsForProject(name, content){
   return validationErrors
 
 }
+
+app.get('/create-project', function(request, response){
+    response.render('create-project.hbs')
+})
 
 app.post("/create-project",function(request, response) {
 
@@ -144,7 +150,8 @@ app.post("/create-project",function(request, response) {
   
     db.run(query, values, function (error){
       if(error){
-        console.log(error)
+        response.render("error-page.hbs")
+
       }else{
         response.redirect("/projects/"+this.lastID)
       }
@@ -175,8 +182,8 @@ app.post("/create-project",function(request, response) {
     db.get(query, values, function(error, project){
 
       if(error){
-        console.log(error)
-        //Display error
+        response.render("error-page.hbs")
+
       }else{
 
         const model = {
@@ -213,8 +220,8 @@ app.post("/create-project",function(request, response) {
     db.get(query, values, function(error, project){
 
       if(error){
-        console.log(error)
-        //Display error
+        response.render("error-page.hbs")
+
       }else{
         const model = {
           project
@@ -245,9 +252,8 @@ app.post("/create-project",function(request, response) {
   
     db.run(query, values, function (error){
       if(error){
-        
-        console.log(error)
-      
+        response.render("error-page.hbs")
+
       }else{
         response.redirect("/projects/" + id)
       }
@@ -318,7 +324,8 @@ app.post("/create-project",function(request, response) {
     
       db.run(query, values, function (error){
         if(error){
-          console.log(error)
+          response.render("error-page.hbs")
+
         }else{
           response.render("message-sent.hbs")
         }
@@ -364,8 +371,8 @@ app.post("/create-project",function(request, response) {
       db.get(query, values, function(error, message){
   
         if(error){
-          console.log(error)
-          //Display error
+          response.render("error-page.hbs")
+
         }else{
   
           const model = {
@@ -412,7 +419,8 @@ app.post("/create-project",function(request, response) {
   
       db.run(query, values, function (error){
         if(error){
-          console.log(error)
+          response.render("error-page.hbs")
+
         }else{
           response.render("guest-sent.hbs")
         }
@@ -445,8 +453,8 @@ app.post("/create-project",function(request, response) {
         db.get(query, values, function(error, guest){
     
           if(error){
-            console.log(error)
-            //Display error
+            response.render("error-page.hbs")
+
           }else{
     
             const model = {
@@ -488,7 +496,8 @@ app.post("/login", function(request, response){
 	  response.redirect("/")
 		
 	}else{
-    // Display error message to user
+    response.render("error-page.hbs")
+
 		const model = {
 			failedToLogin: true
 		}
@@ -505,6 +514,115 @@ app.post("/logout", function(request, response){
 })
 
 
+
+
+
+
+
+
+
+
+//CREATE A COMMENT
+app.get('/create-comment', function(request, response){
+  response.render('create-comment.hbs')
+})
+
+function getValidationErrorsForMessage(comment, commenter){
+  const validationErrors = []
+  if(MIN_COMMENT_LENGTH >= comment.length){
+    validationErrors.push("The comment must contain at least " + MIN_COMMENT_LENGTH + " characters.")
+  }
+  if(MIN_COMMENTER_LENGTH >= commenter.length){
+    validationErrors.push("First name must contain at least " + MIN_COMMENTER_LENGTH + " characters.")
+  }
+  
+  return validationErrors
+
+}
+
+app.post("/create-comment",function(request, response) {
+
+  const comment = request.body.comment
+  const commenter = request.body.commenter
+
+  const errors = validationErrors = getValidationErrorsForMessage(comment, commenter)
+
+  if(errors.length == 0){
+
+    const query = `INSERT INTO comments (comment, commenter) VALUES (?, ?)`
+    const values = [comment, commenter]
+  
+    db.run(query, values, function (error){
+      if(error){
+        response.render("error-page.hbs")
+        
+      }else{
+        response.render("comment/:id.hbs")
+      }
+    })
+
+  }else{
+    const model = {
+      errors,
+      comment, 
+      commentor
+    }
+    response.render('create-comment.hbs', model)
+  }
+
+
+})
+
+app.get('/comments', function(request, response){
+
+  const query = `SELECT * FROM comments`
+
+  db.all(query, function(error, comments){
+
+    const model = {
+      comments,
+    }
+  
+      response.render('comments.hbs', model)
+  })
+  
+})
+
+  app.get("/comment/:id", function(request, response){
+
+    const id = request.params.id
+  
+    const query = `SELECT * FROM comments WHERE id = ?`
+    const values = [id]
+    
+    db.get(query, values, function(error, comments){
+
+      if(error){
+        response.render("error-page.hbs")
+
+      }else{
+
+        const model = {
+          comments,
+        }
+        
+        response.render('comments.hbs', model)
+      }
+      
+    })
+
+  })
+
+  app.get("/comment-delete/:id", function(request, response){
+    const id = request.params.id
+
+    const query = `DELETE FROM comments where id = ?`
+    const values = [id]
+
+    db.run(query, values)
+
+    response.redirect('/comments')
+  })
 
 
 app.listen(8080)
