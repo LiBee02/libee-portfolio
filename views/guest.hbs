@@ -16,6 +16,8 @@
 {{#unless isLoggedIn}}
 <div style="position:relative; text-align:center;">
     <h1>You have to log in!</h1>
-    <button onclick="window.location.href='/login'" class="button button-1" type="button">LOGIN</button>
+    <a href="/login">
+       <input type="submit" value="LOGIN" class="button">
+    </a>
 </div>
 {{/unless}}

@@ -13,7 +13,9 @@
 {{#if isLoggedIn}}
 <div>
     <h2>View messages? Click the button below.</h2>
-    <button onclick="window.location.href='/messages'" class="button button-1" type="button">MESSAGES</button>
+    <a href="messages">
+       <input type="submit" value="MESSAGES" class="button">
+    </a>
 </div>
 {{/if}}
 
@@ -33,5 +35,5 @@
     <div>
         Message: <input type="text" name="message">
     </div>
-    <input type="submit" value="Submit" id="submit-button">
+    <input type="submit" value="SUBMIT" id="submit-button">
 </form>
