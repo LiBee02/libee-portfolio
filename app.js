@@ -6,7 +6,7 @@ const expressSession = require("express-session")
 
 //CREATE PROJECT
 const MIN_PROJECT_NAME_LENGTH = 2
-const MIN_PROJECT_CONTENT_LENGTH = 5 //IDK WTF IS GOING ON WITH THIS SHIT, 10 characters is fucked and below that is fucked too.
+const MIN_PROJECT_CONTENT_LENGTH = 5
 
 //CREATE MESSAGE
 const MIN_MESSAGE_MESSAGE_LENGTH = 6
@@ -52,7 +52,6 @@ db.run(`
 	)
 `)
 
-
 const app = express()
 
 app.use(expressSession({
@@ -61,19 +60,23 @@ app.use(expressSession({
   resave: false
 }))
 
+
 app.engine("hbs", expressHandlebars.engine({
   defaultLayout: 'main.hbs'
 }))
 
+
 app.use(
     express.static('public')
 )
+
 
 app.use(
   express.urlencoded({
     extended: false
   })
 )
+
 
 app.use(function(request, response, next){
 
@@ -92,6 +95,8 @@ app.get('/', function(request, response){
 })
 
 
+
+//PROJECTS
 //PROJECTS
 app.get('/projects', function(request, response){
 
@@ -109,7 +114,8 @@ app.get('/projects', function(request, response){
   
 })
 
-
+//VALIDATION ERRORS FOR PROJECT
+//VALIDATION ERRORS FOR PROJECT
 function getValidationErrorsForProject(name, content){
   const validationErrors = []
 
@@ -124,9 +130,14 @@ function getValidationErrorsForProject(name, content){
 
 }
 
+
+
+//CREATE PROJECT
+//CREATE PROJECT
 app.get('/create-project', function(request, response){
     response.render('create-project.hbs')
 })
+
 
 app.post("/create-project",function(request, response) {
 
@@ -169,336 +180,361 @@ app.post("/create-project",function(request, response) {
 
 
 
-  app.get("/projects/:id", function(request, response){
+//VIEW PROJECT
+//VIEW PROJECT
+app.get("/projects/:id", function(request, response){
 
-    const id = request.params.id
-	
-    const query = `SELECT * FROM projects WHERE id = ?`
-    const values = [id]
-    
-    db.get(query, values, function(error, project){
+  const id = request.params.id
 
-      if(error){
-        response.render("error-page.hbs")
-
-      }else{
-
-        const model = {
-          project,
-        }
-        
-        response.render('project.hbs', model)
-      }
-      
-    })
-
-  })
-
-
-  app.get("/projects-delete/:id", function(request, response){
-    const id = request.params.id
-
-    const query = `DELETE FROM projects where id = ?`
-    const values = [id]
-
-    db.run(query, values)
-
-    response.redirect('/projects')
-  })
-
-
-  app.get("/edit-project/:id", function(request, response){
-
-    const id = request.params.id
-
-    const query = `SELECT * FROM projects WHERE id = ?`
-    const values = [id]
-    
-    db.get(query, values, function(error, project){
-
-      if(error){
-        response.render("error-page.hbs")
-
-      }else{
-        const model = {
-          project
-        }
-    
-        response.render("edit-project.hbs", model)
-        
-      }
-      
-    })
-
-  })
+  const query = `SELECT * FROM projects WHERE id = ?`
+  const values = [id]
   
-  app.post("/edit-project/:id",function(request, response) {
+  db.get(query, values, function(error, project){
 
-    const id = request.params.id
-    const newName = request.body.name
-    const newDate = request.body.date
-    const newContent = request.body.content
-    const newLink = request.body.link
+    if(error){
+      response.render("error-page.hbs")
 
-    const errors = validationErrors = getValidationErrorsForProject(newName, newDate, newContent, newLink)
+    }else{
 
-    if(!request.session.isLoggedIn){
-      errors.push("You have to log in.")
+      const model = {
+        project,
+      }
+      
+      response.render('project.hbs', model)
     }
     
-    if(errors.length == 0){
-      const query = `UPDATE projects SET name = ?, date = ?, content = ?, link = ? WHERE id = ?`;
+  })
+
+})
+
+
+
+//DELETE PROJECT
+//DELETE PROJECT
+app.post("/projects/project/delete/:id", function(request, response){
+  const id = request.params.id
+
+  const query = `DELETE FROM projects where id = ?`
+  const values = [id]
+
+  db.run(query, values)
+
+  response.redirect('/projects')
+})
+
+
+
+//EDIT PROJECT
+//EDIT PROJECT
+app.get("/edit-project/:id", function(request, response){
+
+  const id = request.params.id
+
+  const query = `SELECT * FROM projects WHERE id = ?`
+  const values = [id]
   
-    const values = [newName, newDate, newContent, newLink, id];
+  db.get(query, values, function(error, project){
+
+    if(error){
+      response.render("error-page.hbs")
+
+    }else{
+      const model = {
+        project
+      }
+  
+      response.render("edit-project.hbs", model)
+      
+    }
+    
+  })
+
+})
+
+
+app.post("/edit-project/:id",function(request, response) {
+
+  const id = request.params.id
+  const newName = request.body.name
+  const newDate = request.body.date
+  const newContent = request.body.content
+  const newLink = request.body.link
+
+  const errors = validationErrors = getValidationErrorsForProject(newName, newDate, newContent, newLink)
+
+  if(!request.session.isLoggedIn){
+    errors.push("You have to log in.")
+  }
+  
+  if(errors.length == 0){
+    const query = `UPDATE projects SET name = ?, date = ?, content = ?, link = ? WHERE id = ?`;
+
+  const values = [newName, newDate, newContent, newLink, id];
+
+  db.run(query, values, function (error){
+    if(error){
+      response.render("error-page.hbs")
+
+    }else{
+      response.redirect("/projects/" + id)
+    }
+  })
+
+  }else{
+
+    const model = {
+      project: {
+        id,
+        name: newName,
+        date: newDate,
+        content: newContent,
+        link: newLink
+      },
+      errors
+    }
+
+    response.render("edit-project.hbs", model)
+    
+  }
+
+  
+})
+
+
+
+//CREATE MESSAGE / CONTACT ME
+//CREATE MESSAGE / CONTACT ME
+app.get('/create-message', function(request, response){
+  response.render('create-message.hbs')
+})
+
+
+//VALIDATION ERRORS FOR MESSAGE
+//VALIDATION ERRORS FOR MESSAGE
+function getValidationErrorsForMessage(firstname, lastname, message){
+  const validationErrors = []
+  if(MIN_MESSAGE_FIRSTNAME_LENGTH >= firstname.length){
+    validationErrors.push("First name must contain at least " + MIN_MESSAGE_FIRSTNAME_LENGTH + " characters.")
+  }
+  if(MIN_MESSAGE_LASTNAME_LENGTH >= lastname.length){
+    validationErrors.push("Last name must contain at least " + MIN_MESSAGE_LASTNAME_LENGTH + " characters.")
+  }
+  if(MIN_MESSAGE_MESSAGE_LENGTH >= message.length){
+    validationErrors.push("Message must contain at least " + MIN_MESSAGE_MESSAGE_LENGTH + " characters.")
+  }
+  
+  return validationErrors
+
+}
+
+
+app.post("/create-message",function(request, response) {
+
+  const firstname = request.body.firstname
+  const lastname = request.body.lastname
+  const email = request.body.email
+  const phone = parseInt(request.body.phone)
+  const message = request.body.message
+
+  const errors = validationErrors = getValidationErrorsForMessage(firstname, lastname, email, phone, message)
+
+  if(errors.length == 0){
+
+    const query = `INSERT INTO messages (firstname, lastname, email, phone, message) VALUES (?, ?, ?, ?, ?)`
+    const values = [firstname, lastname, email, phone, message]
   
     db.run(query, values, function (error){
       if(error){
         response.render("error-page.hbs")
 
       }else{
-        response.redirect("/projects/" + id)
+        response.render("message-sent.hbs")
       }
     })
 
-    }else{
-
-      const model = {
-        project: {
-          id,
-          name: newName,
-          date: newDate,
-          content: newContent,
-          link: newLink
-        },
-        errors
-      }
-  
-      response.render("edit-project.hbs", model)
-      
+  }else{
+    const model = {
+      errors,
+      firstname,
+      lastname,
+      email,
+      phone,
+      message
     }
-  
-    
-  })
-
- 
-
-
-
-
-//CONTACT ME//
-//CONTACT ME//
-  app.get('/create-message', function(request, response){
-    response.render('create-message.hbs')
-  })
-
-  function getValidationErrorsForMessage(firstname, lastname, message){
-    const validationErrors = []
-    if(MIN_MESSAGE_FIRSTNAME_LENGTH >= firstname.length){
-      validationErrors.push("First name must contain at least " + MIN_MESSAGE_FIRSTNAME_LENGTH + " characters.")
-    }
-    if(MIN_MESSAGE_LASTNAME_LENGTH >= lastname.length){
-      validationErrors.push("Last name must contain at least " + MIN_MESSAGE_LASTNAME_LENGTH + " characters.")
-    }
-    if(MIN_MESSAGE_MESSAGE_LENGTH >= message.length){
-      validationErrors.push("Message must contain at least " + MIN_MESSAGE_MESSAGE_LENGTH + " characters.")
-    }
-    
-    return validationErrors
-  
+    response.render('create-message.hbs', model)
   }
 
 
-  app.post("/create-message",function(request, response) {
+})
+
+
+
+//VIEW MESSAGES
+//VIEW MESSAGES
+app.get('/messages', function(request, response){
+
+  const query = `SELECT * FROM messages`
+
+  db.all(query, function(error, messages){
+
+    const model = {
+      messages,
+    }
   
-    const firstname = request.body.firstname
-    const lastname = request.body.lastname
-    const email = request.body.email
-    const phone = parseInt(request.body.phone)
-    const message = request.body.message
+      response.render('messages.hbs', model)
+  })
   
-    const errors = validationErrors = getValidationErrorsForMessage(firstname, lastname, email, phone, message)
+})
 
-    if(errors.length == 0){
 
-      const query = `INSERT INTO messages (firstname, lastname, email, phone, message) VALUES (?, ?, ?, ?, ?)`
-      const values = [firstname, lastname, email, phone, message]
-    
-      db.run(query, values, function (error){
-        if(error){
-          response.render("error-page.hbs")
 
-        }else{
-          response.render("message-sent.hbs")
-        }
-      })
+//VIEW MESSAGE
+//VIEW MESSAGE
+app.get("/message/:id", function(request, response){
+
+  const id = request.params.id
+
+  const query = `SELECT * FROM messages WHERE id = ?`
+  const values = [id]
+  
+  db.get(query, values, function(error, message){
+
+    if(error){
+      response.render("error-page.hbs")
 
     }else{
+
       const model = {
-        errors,
-        firstname,
-        lastname,
-        email,
-        phone,
-        message
+        message,
       }
-      response.render('create-message.hbs', model)
+      
+      response.render('message.hbs', model)
     }
+    
+  })
+
+})
 
 
+
+//DELETE MESSAGE
+//DELETE MESSAGE
+app.post("/messages/message/delete/:id", function(request, response){
+  const id = request.params.id
+
+  const query = `DELETE FROM messages where id = ?`
+  const values = [id]
+
+  db.run(query, values)
+
+  response.redirect('/messages')
+})
+
+
+
+//CREATE GUEST
+//CREATE GUEST
+app.get('/create-guest', function(request, response){
+  response.render('create-guest.hbs')
+})
+
+app.post("/create-guest",function(request, response) {
+
+  const firstname = request.body.firstname
+  const lastname = request.body.lastname
+  const email = request.body.email
+  const message = request.body.message
+
+  const query = `INSERT INTO guests (firstname, lastname, email, message) VALUES (?, ?, ?, ?)`
+
+  const values = [firstname, lastname, email, message]
+
+  db.run(query, values, function (error){
+    if(error){
+      response.render("error-page.hbs")
+
+    }else{
+      response.render("guest-sent.hbs")
+    }
+  })
+
+})
+
+
+
+//VIEW GUESTBOOK
+//VIEW GUESTBOOK
+app.get('/guests', function(request, response){
+  
+  const query = `SELECT * FROM guests`
+
+  db.all(query, function(error, guests){
+
+    const model = {
+      guests,
+    }
+  
+      response.render('guests.hbs', model)
   })
   
-  app.get('/messages', function(request, response){
+})
 
-    const query = `SELECT * FROM messages`
+
+
+//VIEW GUEST
+//VIEW GUEST  
+app.get("/guest/:id", function(request, response){
+    
+  const id = request.params.id
   
-    db.all(query, function(error, messages){
+  const query = `SELECT * FROM guests WHERE id = ?`
+  const values = [id]
   
+  db.get(query, values, function(error, guest){
+
+    if(error){
+      response.render("error-page.hbs")
+
+    }else{
+
       const model = {
-        messages,
+        guest,
       }
-    
-        response.render('messages.hbs', model)
-    })
+      
+      response.render('guest.hbs', model)
+    }
     
   })
-  
-    app.get("/message/:id", function(request, response){
-  
-      const id = request.params.id
-    
-      const query = `SELECT * FROM messages WHERE id = ?`
-      const values = [id]
-      
-      db.get(query, values, function(error, message){
-  
-        if(error){
-          response.render("error-page.hbs")
 
-        }else{
-  
-          const model = {
-            message,
-          }
-          
-          response.render('message.hbs', model)
-        }
-        
-      })
-  
-    })
-
-    app.get("/message-delete/:id", function(request, response){
-      const id = request.params.id
-  
-      const query = `DELETE FROM messages where id = ?`
-      const values = [id]
-  
-      db.run(query, values)
-  
-      response.redirect('/messages')
-    })
+})
 
 
 
+//DELETE GUEST 
+//DELETE GUEST   
+app.post("/guests/guest/delete/:id", function(request, response){
+  const id = request.params.id
 
+  const query = `DELETE FROM guests where id = ?`
+  const values = [id]
 
-    //GUESTBOOK/
-    app.get('/create-guest', function(request, response){
-      response.render('create-guest.hbs')
-    })
-  
-    app.post("/create-guest",function(request, response) {
-    
-      const firstname = request.body.firstname
-      const lastname = request.body.lastname
-      const email = request.body.email
-      const message = request.body.message
-    
-      const query = `INSERT INTO guests (firstname, lastname, email, message) VALUES (?, ?, ?, ?)`
-    
-      const values = [firstname, lastname, email, message]
-  
-      db.run(query, values, function (error){
-        if(error){
-          response.render("error-page.hbs")
+  db.run(query, values)
 
-        }else{
-          response.render("guest-sent.hbs")
-        }
-      })
-  
-    })
-    
-    app.get('/guests', function(request, response){
-  
-      const query = `SELECT * FROM guests`
-    
-      db.all(query, function(error, guests){
-    
-        const model = {
-          guests,
-        }
-      
-          response.render('guests.hbs', model)
-      })
-      
-    })
-    
-      app.get("/guest/:id", function(request, response){
-    
-        const id = request.params.id
-      
-        const query = `SELECT * FROM guests WHERE id = ?`
-        const values = [id]
-        
-        db.get(query, values, function(error, guest){
-    
-          if(error){
-            response.render("error-page.hbs")
-
-          }else{
-    
-            const model = {
-              guest,
-            }
-            
-            response.render('guest.hbs', model)
-          }
-          
-        })
-    
-      })
-
-    app.get("/guest-delete/:id", function(request, response){
-      const id = request.params.id
-  
-      const query = `DELETE FROM guests where id = ?`
-      const values = [id]
-  
-      db.run(query, values)
-  
-      response.redirect('/guests')
-    })
+  response.redirect('/guests')
+})
 
 
 
-
-
-
-      
-
-
-//ABOUT PAGE
+//ABOUT ME
+//ABOUT ME
   app.get('/about', function(request, response){
     response.render('about.hbs')
   })
 
 
 
-
-
-
-// LOGIN
+//LOGIN
+//LOGIN
 app.get("/login", function(request, response){
 	response.render("login.hbs")
 })
@@ -524,9 +560,15 @@ app.post("/login", function(request, response){
 	
 })
 
+
+
+//LOGOUT
+//LOGOUT
 app.post("/logout", function(request, response){
   request.session.isLoggedIn = false
   response.redirect("/")
 })
+
+
 
 app.listen(8080)
