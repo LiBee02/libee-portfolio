@@ -3,6 +3,7 @@ const express = require('express')
 const expressHandlebars = require('express-handlebars')
 const sqlite3 = require('sqlite3')
 const expressSession = require("express-session")
+const bcrypt = require('bcrypt')
 
 //CREATE PROJECT
 const MIN_PROJECT_NAME_LENGTH = 2
@@ -15,11 +16,13 @@ const MIN_MESSAGE_LASTNAME_LENGTH = 2
 
 //ADMIN CREDENTIALS
 const ADMIN_USERNAME = "admin"
-const ADMIN_PASSWORD = "abc123"
+const ADMIN_PASSWORD = "$2b$10$JhS5IaUJfspzYofvxVp.lOgWzHxLy8ChbBZuB7seW173DXMOh7Pqy"
 
 
 const db = new sqlite3.Database('libee-database.db')
 
+
+//MESSAGES TABLE
 db.run(`
 	CREATE TABLE IF NOT EXISTS projects (
 		id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -30,6 +33,7 @@ db.run(`
 	)
 `)
 
+//MESSAGES TABLE
 db.run(`
 	CREATE TABLE IF NOT EXISTS messages (
 		id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -41,7 +45,7 @@ db.run(`
 	)
 `)
 
-// FOR THE GUESTBOOK
+//GUESTBOOK TABLE
 db.run(` 
 	CREATE TABLE IF NOT EXISTS guests (
 		id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -543,8 +547,9 @@ app.post("/login", function(request, response){
 	
 	const enteredUsername = request.body.username
 	const enteredPassword = request.body.password
-	
-	if(enteredUsername == ADMIN_USERNAME && enteredPassword == ADMIN_PASSWORD){
+	const passwordIsCorrect = bcrypt.compareSync(enteredPassword, ADMIN_PASSWORD); // true
+  
+	if(enteredUsername == ADMIN_USERNAME && passwordIsCorrect){
     // Login
 		request.session.isLoggedIn = true
 	  response.redirect("/")
@@ -568,7 +573,5 @@ app.post("/logout", function(request, response){
   request.session.isLoggedIn = false
   response.redirect("/")
 })
-
-
 
 app.listen(8080)
