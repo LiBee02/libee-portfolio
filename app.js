@@ -553,7 +553,7 @@ app.post("/login", function(request, response){
 	if(enteredUsername == ADMIN_USERNAME && passwordIsCorrect){
     // Login
 		request.session.isLoggedIn = true
-	  response.redirect("/")
+	  response.redirect("/home")
 		
 	}else{
 		const model = {
@@ -572,7 +572,7 @@ app.post("/login", function(request, response){
 //LOGOUT
 app.post("/logout", function(request, response){
   request.session.isLoggedIn = false
-  response.redirect("/")
+  response.redirect("/home")
 })
 
 
