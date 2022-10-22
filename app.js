@@ -94,7 +94,7 @@ app.use(function(request, response, next){
 })
 
 
-app.get('/home', function(request, response){
+app.get('/', function(request, response){
 
   response.render('home.hbs')
 })
@@ -553,7 +553,7 @@ app.post("/login", function(request, response){
 	if(enteredUsername == ADMIN_USERNAME && passwordIsCorrect){
     // Login
 		request.session.isLoggedIn = true
-	  response.redirect("/home")
+	  response.redirect("/")
 		
 	}else{
 		const model = {
@@ -572,14 +572,7 @@ app.post("/login", function(request, response){
 //LOGOUT
 app.post("/logout", function(request, response){
   request.session.isLoggedIn = false
-  response.redirect("/home")
+  response.redirect("/")
 })
 
-
-app.listen(process.env.PORT);
-
-let port = process.env.PORT;
-if (port == null || port == "") {
-  port = 8000;
-}
-app.listen(port);
+app.listen(8080)
