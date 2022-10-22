@@ -94,7 +94,7 @@ app.use(function(request, response, next){
 })
 
 
-app.get('/', function(request, response){
+app.get('/home', function(request, response){
 
   response.render('home.hbs')
 })
