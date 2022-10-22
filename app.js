@@ -5,6 +5,7 @@ const sqlite3 = require('sqlite3')
 const expressSession = require("express-session")
 const bcrypt = require('bcrypt')
 
+
 //CREATE PROJECT
 const MIN_PROJECT_NAME_LENGTH = 2
 const MIN_PROJECT_CONTENT_LENGTH = 5
