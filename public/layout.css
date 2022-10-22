@@ -35,7 +35,7 @@ body{
     top:1rem;
 }
 
-#logo{
+#logo-ls{
     position:relative;
     top:5px;
     font-size: 40px;
@@ -43,7 +43,7 @@ body{
     font-family: 'Ms Madi', cursive;
 }
 
-#logo:hover{
+#logo-ls:hover{
     color: var(--darkblue);
 } 
 
